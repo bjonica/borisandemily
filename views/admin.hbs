@@ -1,0 +1,124 @@
+<h1 class="cover-heading">{{coverHeading}}</h1>
+<p class="lead">Edit your RSVP list</p>
+
+{{#if rsvpId}}
+    <form class="form-horizontal adminForm" method="post" action="/admin/{{rsvpId}}">
+        <div class="form-group">
+            <label for="email" class="col-sm-4 control-label">Email Address</label>
+
+            <div class="col-sm-8">
+                <input type="email" class="form-control" name="email" id="email" placeholder="Email Address"
+                       {{#if email}}value="{{email}}"{{/if}}>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="attendance" class="col-sm-4 control-label">
+                Are they attending?
+            </label>
+
+            <div class="col-sm-8" id="attendance">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="attending" id="attendanceYes" value="yes"
+                               {{#if isAttending}}checked{{/if}}>
+                        Yes
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="attending" id="attendanceNo" value="no"
+                               {{#if isNotAttending}}checked{{/if}}>
+                        No
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="attending" id="attendanceMaybe" value="maybe"
+                               {{#if isMaybeAttending}}checked{{/if}}>
+                        They're not sure
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="attending" id="attendanceNA" value="">
+                        N/A
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="guests" class="col-sm-4 control-label">Guests</label>
+
+            <div class="guestDiv col-sm-8">
+                {{#if firstGuest}}
+                    <div class="entry input-group">
+                        <input class="form-control" name="guests[]" type="text" placeholder="Guest Name"
+                               value="{{firstGuest.name}}"/>
+                        <span class="input-group-btn">
+                            <button class="btn btn-danger btn-remove" type="button">
+                                <span class="glyphicon glyphicon-minus"></span>
+                            </button>
+                        </span>
+                    </div>
+                    {{#each otherGuests}}
+                        <div class="entry input-group">
+
+                            <input class="form-control" name="guests[]" type="text" placeholder="Guest Name"
+                                   value="{{this.name}}"/>
+                            <span class="input-group-btn">
+                                <button class="btn btn-danger btn-remove" type="button">
+                                    <span class="glyphicon glyphicon-minus"></span>
+                                </button>
+                            </span>
+                        </div>
+                    {{/each}}
+                {{/if}}
+                <div class="entry input-group">
+                    <input class="form-control" name="guests[]" type="text" placeholder="Guest Name">
+                        <span class="input-group-btn">
+                            <button class="btn btn-success btn-add" type="button">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </button>
+                        </span>
+                </div>
+
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="specialRequests" class="col-sm-4 control-label">
+                Special Requests
+            </label>
+            <div class="col-sm-8">
+                <textarea class="form-control" id="specialRequests" name="specialRequests" rows="3" placeholder="Do they have other special requests, such as dietary restrictions?">{{#if specialRequests}}{{specialRequests}}{{/if}}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-8">
+                <button type="submit" class="btn btn-default">Save RSVP</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-8">
+                <button type="submit" class="btn btn-danger" name="delete" value="{{rsvpId}}">Delete RSVP!</button>
+            </div>
+        </div>
+    </form>
+{{else}}
+    <form class="form-horizontal" method="get" action="/admin">
+        <div class="form-group">
+            <label for="rsvpId" class="control-label col-sm-4">
+                RSVP Code
+            </label>
+
+            <div class="col-sm-8">
+                <input type="text" class="form-control" maxlength="4" name="rsvpId" id="rsvpId">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-8">
+                <button type="submit" class="btn btn-default">View RSVP</button>
+            </div>
+        </div>
+    </form>
+{{/if}}
+
