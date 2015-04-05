@@ -108,9 +108,10 @@ router.post('/rsvp/:id',
 
 app.use(koaStatic(__dirname + '/bower_components/bootstrap/dist'));
 app.use(koaStatic(__dirname + '/bower_components/jquery/dist'));
-app.use(koaStatic(__dirname + '/layouts/css'));
-app.use(koaStatic(__dirname + '/layouts/img'));
-app.use(koaStatic(__dirname + '/layouts/static'));
+app.use(koaStatic(__dirname + '/layouts/static', {
+  maxAge: 60 * 60 * 24 * 365
+}));
+
 
 app.use(router.routes());
 app.use(router.allowedMethods());
