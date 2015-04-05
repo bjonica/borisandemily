@@ -10,22 +10,6 @@ var app = Koa();
 
 var parties = wrap(db.get('parties'));
 
-//parties.insert({
-//    rsvpId: 1,
-//    rsvped: false,
-//    attending: null,
-//    email: null,
-//    requests: null,
-//    additionalAllowed: 0,
-//    additionalAttending: 0,
-//    partyMembers: [
-//        {
-//            name: "Test plus one",
-//            attending: true
-//        }
-//    ]
-//});
-
 app.use(handlebars({
     defaultLayout: "main",
     cache: true
@@ -45,7 +29,7 @@ app.use(function* (next) {
 
 router.get('/rsvp', function* (next) {
     if (this.request.query && this.request.query.rsvpId) {
-        this.redirect('rsvp/' + this.request.query.rsvpId);
+        this.redirect('/rsvp/' + this.request.query.rsvpId);
     } else {
         yield this.render("rsvp", {
             coverHeading: "RSVP",
@@ -59,6 +43,7 @@ router.get('/rsvp', function* (next) {
 router.get('/rsvp/:id',
     function* (next) {
         this.party = yield parties.findOne({ rsvpId: parseInt(this.params.id) });
+        this.success = this.request.query.success;
         yield next;
     },
     function* (next) {
@@ -77,10 +62,13 @@ router.get('/rsvp/:id',
                 found: true,
                 rsvped: this.party.rsvped,
                 rsvpId: this.party.rsvpId,
-                attending: this.party.attending,
+                isAttending: this.party.attending === 'yes',
+                isNotAttending: this.party.attending === 'no',
+                isMaybeAttending: this.party.attending === 'maybe',
                 email: this.party.email,
-                requests: this.party.requests,
-                partyMembers: this.party.partyMembers
+                specialRequests: this.party.requests,
+                partyMembers: this.party.partyMembers,
+                success: this.success
             })
         }
         console.log(this.party);
@@ -92,35 +80,22 @@ router.post('/rsvp/:id',
     function* (next) {
         var body = this.request.body;
         var party = yield parties.findOne({ rsvpId: parseInt(this.params.id) });
-        var isAttending = body.attending === 'yes';
         var rsvped = false;
         var partyMembers = body.partyAttendees;
         party.partyMembers.forEach(function (e, i, a) {
-            e.attending = !(typeof(partyMembers.find(p => p === e.name)) === 'undefined');
+            e.attending = partyMembers.indexOf(e.name) != -1;
         });
         if (body.attending) { rsvped = true }
-        db.update({rsvpId: id}, {
-            email: this.request.body.email,
-            attending: isAttending,
-            rsvped: rsvped,
-            requests: body.specialRequests,
-            partyMembers: party.partyMembers
-        });
-        //parties.insert({
-//    rsvpId: 1,
-//    rsvped: false,
-//    attending: null,
-//    email: null,
-//    requests: null,
-//    additionalAllowed: 0,
-//    additionalAttending: 0,
-//    partyMembers: [
-//        {
-//            name: "Test plus one",
-//            attending: true
-//        }
-//    ]
-//});
+        party.email = body.email;
+        party.attending = body.attending;
+        party.rsvped = rsvped;
+        party.requests = body.specialRequests;
+        parties.updateById(party._id, party);
+        //this.success = true;
+        yield next;
+    },
+    function* (next) {
+        this.redirect('/rsvp/' + this.params.id + '?success=true');
         yield next;
     }
 );
