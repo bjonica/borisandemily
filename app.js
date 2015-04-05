@@ -142,7 +142,7 @@ router.post('/admin/:id',
         yield next;
     },
     function* (next) {
-        this.redirect('/admin/' + this.params.id);
+        this.redirect('/admin/');
         yield next;
     }
 );
