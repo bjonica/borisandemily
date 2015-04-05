@@ -82,9 +82,15 @@ router.post('/rsvp/:id',
         var party = yield parties.findOne({ rsvpId: parseInt(this.params.id) });
         var rsvped = false;
         var partyMembers = body.partyAttendees;
-        party.partyMembers.forEach(function (e, i, a) {
-            e.attending = partyMembers.indexOf(e.name) != -1;
-        });
+        if (typeof(partyMembers) !== 'undefined') {
+            party.partyMembers.forEach(function (e, i, a) {
+                e.attending = partyMembers.indexOf(e.name) != -1;
+            });
+        } else {
+            party.partyMembers.forEach(function (e, i, a) {
+                e.attending = false;
+            });
+        }
         if (body.attending) { rsvped = true }
         party.email = body.email;
         party.attending = body.attending;
