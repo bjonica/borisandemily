@@ -130,6 +130,7 @@ router.post('/admin/:id',
         }
         party.email = body.email;
         party.rsvped = rsvped;
+        party.greeting = body.greeting;
         if (body.specialRequests != null) {
             party.requests = body.specialRequests;
         }
@@ -176,7 +177,7 @@ router.get('/rsvp/:id',
             })
         } else {
             yield this.render("rsvp", {
-                coverHeading: "RSVP",
+                coverHeading: this.party.greeting,
                 title: "Boris & Emily",
                 subTitle: "May 31, 2015",
                 found: true,
