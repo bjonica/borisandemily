@@ -1,0 +1,19 @@
+{
+  "name": "emilyandboris",
+  "version": "0.0.0",
+  "authors": [
+    "Boris Jonica <boris.jonica@utexas.edu>"
+  ],
+  "license": "MIT",
+  "homepage": "borisandemily.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.4"
+  }
+}
