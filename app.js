@@ -235,11 +235,32 @@ router.post('/rsvp/:id',
         party.rsvped = rsvped;
         party.requests = body.specialRequests;
         parties.updateById(party._id, party);
-        //this.success = true;
+        this.state.party = party;
         yield next;
     },
     function* (next) {
         this.redirect('/rsvp/' + this.params.id + '?success=true');
+        yield next;
+    },
+    function* (next) {
+        var mailOptions = {
+            from: 'rsvp@borisandemily.com',
+            to: process.env.GMAIL_USER,
+            subject: 'RSVP Update: ' + this.state.party.partyMembers[0].name,
+            text: "email: " + this.state.party.email + "\n" +
+            "attending: " + this.state.party.attending + "\n" +
+            "party: " + this.state.party.partyMembers + "\n" +
+            "special requests: " + this.state.party.requests
+        };
+        var that = this;
+        transporter.sendMail(mailOptions, function(error, info) {
+            if(error) {
+                console.log(error);
+                that.status = 503;
+            } else {
+                console.log('Message sent: ' + info.response);
+            }
+        });
         yield next;
     }
 );
