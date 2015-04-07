@@ -6,9 +6,18 @@ var monk = require('monk');
 var wrap = require('co-monk');
 var db = monk('localhost/test');
 var bodyParser = require('koa-bodyparser');
+var nodemailer = require('nodemailer');
 var app = Koa();
 
 var parties = wrap(db.get('parties'));
+
+var transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS
+    }
+});
 
 app.use(handlebars({
     defaultLayout: "main",
@@ -24,6 +33,11 @@ app.use(function* (next) {
             subTitle: "May 31, 2015"
         });
     }
+    yield next;
+});
+
+router.get('/', function* (next) {
+    yield this.redirect('/rsvp');
     yield next;
 });
 
@@ -155,7 +169,8 @@ router.get('/rsvp', function* (next) {
         yield this.render("rsvp", {
             coverHeading: "RSVP",
             title: "Boris & Emily",
-            subTitle: "May 31, 2015"
+            subTitle: "May 31, 2015",
+            selectedRsvp: true
         });
     }
     yield next;
@@ -173,7 +188,8 @@ router.get('/rsvp/:id',
                 coverHeading: "RSVP",
                 title: "Boris & Emily",
                 subTitle: "May 31, 2015",
-                notFound: true
+                notFound: true,
+                selectedRsvp: true
             })
         } else {
             yield this.render("rsvp", {
@@ -189,7 +205,8 @@ router.get('/rsvp/:id',
                 email: this.party.email,
                 specialRequests: this.party.requests,
                 partyMembers: this.party.partyMembers,
-                success: this.success
+                success: this.success,
+                selectedRsvp: true
             })
         }
         console.log(this.party);
@@ -223,6 +240,74 @@ router.post('/rsvp/:id',
     },
     function* (next) {
         this.redirect('/rsvp/' + this.params.id + '?success=true');
+        yield next;
+    }
+);
+
+router.get('/contact', function* (next) {
+    yield this.render('contact', {
+        coverHeading: 'Contact Us',
+        title: "Boris & Emily",
+        subTitle: "May 31, 2015",
+        selectedContact: true
+    });
+    yield next;
+});
+
+router.post('/contact',
+    function* (next) {
+        var body = this.request.body;
+        if (body.senderName == null ||
+            body.senderName === '' ||
+            body.senderEmail == null ||
+            body.senderEmail === '' ||
+            body.message == null ||
+            body.message === '') {
+            this.status = 503;
+            return yield this.render('contact', {
+                coverHeading: 'Contact Us',
+                issue: 'There was an error with the form. Make sure all fields are filled out',
+                title: "Boris & Emily",
+                subTitle: "May 31, 2015",
+                selectedContact: true
+            });
+        }
+        yield next;
+    },
+    function* (next) {
+        var mailOptions = {
+            from: this.request.body.senderName + ' <' + this.request.body.senderEmail + '>',
+            to: process.env.GMAIL_USER,
+            subject: 'BorisAndEmily: Message from ' + this.request.body.senderName,
+            text: "Sender: " + this.request.body.senderEmail + "\n\nMessage:\n" + this.request.body.message
+        };
+        var that = this;
+        transporter.sendMail(mailOptions, function(error, info) {
+            if(error) {
+                console.log(error);
+                that.status = 503;
+            } else {
+                console.log('Message sent: ' + info.response);
+            }
+        });
+        yield next;
+    },
+    function* (next) {
+        if (this.status != 503) {
+            yield this.render('thanks', {
+                coverHeading: 'Message Sent!',
+                title: "Boris & Emily",
+                subTitle: "May 31, 2015"
+            });
+        } else {
+            yield this.render('contact', {
+                coverHeading: 'Contact Us',
+                issue: "For some reason, the email wouldn't send. Try again?",
+                title: "Boris & Emily",
+                subTitle: "May 31, 2015",
+                selectedContact: true
+            });
+        }
         yield next;
     }
 );

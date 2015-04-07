@@ -24,9 +24,9 @@
                         <h4 class="masthead-subbrand">{{subTitle}}</h4>
                         <nav>
                             <ul class="nav masthead-nav">
-                                <li class="active"><a href="/rsvp">RSVP</a></li>
-                                <li><a href="/registry">Registry</a></li>
-                                <li><a href="/contact">Contact Us</a></li>
+                                <li {{#if selectedRsvp}}class="active"{{/if}}><a href="/rsvp">RSVP</a></li>
+                                <li><a href="https://www.zola.com/registry/emilyandboris">Registry</a></li>
+                                <li {{#if selectedContact}}class="active"{{/if}}><a href="/contact">Contact Us</a></li>
                             </ul>
                         </nav>
                     </div>
