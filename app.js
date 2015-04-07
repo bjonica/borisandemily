@@ -37,7 +37,7 @@ app.use(function* (next) {
 });
 
 router.get('/', function* (next) {
-    yield this.redirect('/rsvp');
+    this.redirect('/rsvp');
     yield next;
 });
 
