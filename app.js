@@ -292,6 +292,7 @@ router.get('/export',
               response = response + "," + response.specialRequests + "\n";
           }
       });
+      this.response.type = 'text/csv';
       this.response.body = response;
       //yield this.render('export', {
       //    template: 'csv',
