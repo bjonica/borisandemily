@@ -250,7 +250,7 @@ router.post('/rsvp/:id',
                 subject: 'RSVP Update: ' + this.state.party.partyMembers[0].name,
                 text: "email: " + this.state.party.email + "\n" +
                 "attending: " + this.state.party.attending + "\n" +
-                "party: " + this.state.party.partyMembers + "\n" +
+                "party: " + JSON.stringify(this.state.party.partyMembers) + "\n" +
                 "special requests: " + this.state.party.requests
             };
             var that = this;
@@ -276,6 +276,14 @@ router.get('/contact', function* (next) {
     });
     yield next;
 });
+
+router.get('/export',
+  function* (next) {
+      var result = yield parties.find();
+      this.response.body = JSON.stringify(result);
+      yield next;
+  }
+);
 
 router.post('/contact',
     function* (next) {
