@@ -279,8 +279,10 @@ router.get('/contact', function* (next) {
 
 router.get('/export',
   function* (next) {
-      var result = yield parties.find();
-      this.response.body = JSON.stringify(result);
+      var result = yield parties.find({});
+      yield this.render('export', {
+          result: JSON.stringify(result)
+      });
       yield next;
   }
 );
