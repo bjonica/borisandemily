@@ -1,6 +1,6 @@
 {{#each result}}
     {{#if this.rsvped}}
-        {{this.rsvpId}},{{#each this.partyMembers}}{{#if this.attending}}{{this}};{{/if}}{{/each}}
+        {{this.rsvpId}},{{#each this.partyMembers}}{{#if this.attending}}{{this.name}};{{/if}}{{/each}}
 
     {{/if}}
 {{/each}}

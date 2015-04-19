@@ -280,10 +280,23 @@ router.get('/contact', function* (next) {
 router.get('/export',
   function* (next) {
       var result = yield parties.find({rsvped: true});
-      yield this.render('export', {
-          template: 'csv',
-          result: JSON.stringify(result)
+      var response = "";
+      result.forEach(function(e, i, a) {
+          if (e.rsvped) {
+              response = response + e.rsvpId.toString() + ",";
+              result.forEach(function(p) {
+                  if (p.attending) {
+                      response = response + p.name + ";"
+                  }
+              });
+              response = response + "," + response.specialRequests + "\n";
+          }
       });
+      this.response.body = response;
+      //yield this.render('export', {
+      //    template: 'csv',
+      //    result: JSON.stringify(result)
+      //});
       yield next;
   }
 );
