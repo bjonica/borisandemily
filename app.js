@@ -279,8 +279,9 @@ router.get('/contact', function* (next) {
 
 router.get('/export',
   function* (next) {
-      var result = yield parties.find({});
+      var result = yield parties.find({rsvped: true});
       yield this.render('export', {
+          template: 'csv',
           result: JSON.stringify(result)
       });
       yield next;
