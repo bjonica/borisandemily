@@ -289,7 +289,7 @@ router.get('/export',
                       response = response + p.name + ";"
                   }
               });
-              response = response + "," + response.specialRequests + "\n";
+              response = response + ",\"" + e.specialRequests + "\"\n";
           }
       });
       this.response.type = 'text/csv';
