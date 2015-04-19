@@ -284,7 +284,7 @@ router.get('/export',
       result.forEach(function(e, i, a) {
           if (e.rsvped) {
               response = response + e.rsvpId.toString() + ",";
-              result.forEach(function(p) {
+              e.partyMembers.forEach(function(p) {
                   if (p.attending) {
                       response = response + p.name + ";"
                   }
